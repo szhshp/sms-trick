@@ -35,7 +35,8 @@ test("Boss直聘", async ({ page }) => {
   await page.getByRole("textbox", { name: "手机号" }).fill(ENV_CONFIG.TARGET_TEL_NUM);
   await page.getByRole("checkbox").check();
   await page.getByText("发送验证码").click();
-  await page.locator('.yidun_logo').click();
+  await page.getByText(/获取验证码|点击按钮进行验证|点击完成验证/).click();
+  await page.getByText("已发送").click();
 });
 
 test("抖音", async ({ page }) => {
@@ -79,12 +80,28 @@ test("豌豆荚", async ({ page }) => {
   await expect(page.getByText('重新获取')).toBeVisible();
 });
 
+
+test('百度', async ({ page }) => {
+  await page.goto('https://www.baidu.com/');
+  await page.getByRole('link', { name: '登录' }).click();
+  await page.getByText('短信登录').click();
+  await w({ page });
+  await page.getByRole('textbox', { name: '请输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
+  await page.getByRole('checkbox', { name: '阅读并接受' }).check();
+  await page.getByRole('button', { name: '发送验证码' }).click();
+  await w({ page });
+  await page.getByRole('button', { name: '立即注册' }).click();
+  await expect(page.getByText('59')).toBeVisible();
+});
+
 test('天猫', async ({ page }) => {
   await page.goto('https://login.taobao.com/havanaone/login/login.htm?bizName=taobao');
   await page.getByRole('link', { name: '短信登录' }).click();
   await page.getByRole('textbox', { name: '请输入手机号' }).click();
+  await w({ page });
   await page.getByRole('textbox', { name: '请输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
   await page.getByRole('link', { name: '获取验证码' }).click();
+  await w({ page });
   await expect(page.getByText('重发')).toBeVisible();
 });
 
@@ -102,5 +119,24 @@ test("私募网", async ({ page }) => {
   await page
     .getByRole("textbox", { name: "请输入手机号" })
     .fill(ENV_CONFIG.TARGET_TEL_NUM);
-  await page.getByRole("button", { name: "重发" }).click();
+  await page.locator('label span').nth(1).click();
+  await w({ page });
+  await page.getByRole('button', { name: '发送验证码' }).click();
+
+  if (page.getByText('重发')) {
+    const element = await page.locator('#aliyunCaptcha-sliding-slider');
+    const box = await element.boundingBox();
+    if (box) {
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width / 2 + 100 + Math.random() * 50, box.y + box.height / 2 + Math.random() * 50);
+      await w({ page });
+      await page.mouse.move(box.x + box.width / 2 + 200 + Math.random() * 50, box.y + box.height / 2 + 20 + Math.random() * 50);
+      await w({ page });
+      await page.mouse.move(box.x + box.width / 2 + 400 + Math.random() * 50, box.y + box.height / 2 + 20 + Math.random() * 50);
+      await page.mouse.up();
+    }
+    await w({ page });
+  }
+
 });
