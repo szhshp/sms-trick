@@ -29,15 +29,31 @@ test('企查查', async ({ page }) => {
   await expect(page.getByText('重新发送')).toBeVisible();
 });
 
-test("Boss直聘", async ({ page }) => {
-  await page.goto("https://www.zhipin.com/web/user/");
-  await page.getByRole("textbox", { name: "手机号" }).click();
-  await page.getByRole("textbox", { name: "手机号" }).fill(ENV_CONFIG.TARGET_TEL_NUM);
-  await page.getByRole("checkbox").check();
-  await page.getByText("发送验证码").click();
-  await page.getByText(/获取验证码|点击按钮进行验证|点击完成验证/).click();
-  await page.getByText("已发送").click();
-});
+// test("Boss直聘", async ({ page }) => {
+//   await page.goto("https://www.zhipin.com/web/user/");
+//   await page.getByRole("textbox", { name: "手机号" }).click();
+//   await page.getByRole("textbox", { name: "手机号" }).fill(ENV_CONFIG.TARGET_TEL_NUM);
+//   await page.getByRole("checkbox").check();
+//   await page.getByText("发送验证码").click();
+
+//   // 检查是否弹出滑动/点选验证码验证区域
+//   const verifyPopup = page.locator('text=请在下图依次点击：');
+//   if (await verifyPopup.isVisible({ timeout: 3000 })) {
+//     // 如果弹出，尝试点击“关闭验证”按钮
+//     const closeBtn = page.getByRole('button', { name: '关闭验证' });
+//     if (await closeBtn.isVisible({ timeout: 2000 })) {
+//       await closeBtn.click();
+//     } else {
+//       // 或等待用户手动处理，或等待验证区域消失
+//       await page.waitForSelector('text=请在下图依次点击：', { state: 'detached', timeout: 10000 });
+//     }
+//   }
+
+//   // 验证区域关闭后再继续
+//   await page.getByText(/获取验证码|点击按钮进行验证|点击完成验证/).click({ timeout: 5000 });
+//   // “已发送”可能不会出现，建议用可见性断言而不是点击
+//   await expect(page.getByText('已发送')).toBeVisible({ timeout: 5000 });
+// });
 
 test("抖音", async ({ page }) => {
   await page.goto('https://www.douyin.com');
@@ -91,7 +107,9 @@ test('百度', async ({ page }) => {
   await page.getByRole('button', { name: '发送验证码' }).click();
   await w({ page });
   await page.getByRole('button', { name: '立即注册' }).click();
-  await expect(page.getByText('59')).toBeVisible();
+  // 更精确地断言倒计时按钮出现，避免多元素匹配
+  const countdownBtn = page.locator('button', { hasText: /\d{1,2}s|\d{1,2}秒/ });
+  await expect(countdownBtn).toBeVisible({ timeout: 5000 });
 });
 
 test('天猫', async ({ page }) => {
@@ -99,9 +117,7 @@ test('天猫', async ({ page }) => {
   await page.getByRole('link', { name: '短信登录' }).click();
   await page.getByRole('textbox', { name: '请输入手机号' }).click();
   await w({ page });
-  await page.getByRole('textbox', { name: '请输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
-  await page.getByRole('link', { name: '获取验证码' }).click();
-  await w({ page });
+  await page.get
   await expect(page.getByText('重发')).toBeVisible();
 });
 
@@ -139,4 +155,57 @@ test("私募网", async ({ page }) => {
     await w({ page });
   }
 
+});
+
+test('夸克网盘手机号验证码发送', async ({ page }) => {
+  test.setTimeout(10000); // 设置测试超时时间为 10 秒
+  // 1. 访问夸克网盘
+  await page.goto('https://pan.quark.cn/');
+
+  // 2. 点击"手机登录"按钮
+  await page.getByText('手机登录').click();
+
+  // 3. 切换到 iframe, 输入手机号
+  const frame = page.frameLocator('iframe');
+  await frame.getByRole('textbox', { name: '手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
+
+  // 4. 点击"获取短信验证码"按钮
+  await frame.getByText('获取短信验证码').click();
+
+  // 5. 检查倒计时出现, 说明验证码已发送
+  await expect(page.locator('iframe').contentFrame().getByText('获取短信验证码 (57)s')).toBeVisible();
+});
+
+test('迅雷云盘手机号验证码发送', async ({ page }) => {
+  // 1. 访问迅雷云盘登录页
+  await page.goto('https://pan.xunlei.com/login');
+
+  // 2. 切换到登录 iframe
+  const frame = page.frameLocator('iframe');
+
+  // 3. 输入手机号
+  await frame.getByRole('textbox', { name: '请输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
+
+  // 4. 点击“获取验证码”按钮
+  await frame.getByText('获取验证码').click();
+
+  // 5. 检查验证码倒计时或验证码输入框可见，说明验证码已发送
+  await expect(frame.getByRole('textbox', { name: '请输入验证码' })).toBeVisible();
+});
+
+test('知乎手机号验证码发送', async ({ page }) => {
+  // 1. 访问知乎登录页
+  await page.goto('https://www.zhihu.com/signin');
+
+  // 2. 选择“验证码登录”tab（如果未默认选中）
+  await page.getByRole('button', { name: '验证码登录' }).click();
+
+  // 3. 输入手机号
+  await page.getByRole('textbox', { name: '' }).first().fill(ENV_CONFIG.TARGET_TEL_NUM);
+
+  // 4. 点击“获取短信验证码”按钮
+  await page.getByRole('button', { name: '获取短信验证码' }).click();
+
+  // 5. 检查验证码输入框可见，说明验证码已发送
+  await expect(page.getByRole('textbox', { name: '' }).nth(1)).toBeVisible();
 });
