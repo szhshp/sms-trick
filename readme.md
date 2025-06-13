@@ -2,13 +2,27 @@
 
 这是一个恶作剧项目, 目的是给"朋友"发送短信.
 
-通过 Playwright 一次进行十余个网站的验证码发送.
+比如亲切地问候骗我钱的闲鱼卖家.
+
+一次进行十余个网站的验证码发送.
 
 仅供娱乐. 
 
+## 使用
 
-> 千万不要设置每分钟发 10 次喔! 
->
-> 千万不要伪装 IP 运行喔!
->
-> 千万不要用这个来欺负骗你钱的咸鱼卖家喔!
+### Config
+
+创建一个`.env`
+
+```
+TARGET_TEL_NUM=13XXXXXXXXX  
+```
+
+
+## Play the trick!
+
+```
+npm i
+npx playwright install chromium
+npx playwright test
+```
