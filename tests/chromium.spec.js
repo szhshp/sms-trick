@@ -55,7 +55,7 @@ test('企查查', async ({ page }) => {
 //   await expect(page.getByText('已发送')).toBeVisible({ timeout: 5000 });
 // });
 
-test("抖音", async ({ page }) => {
+test('抖音', async ({ page }) => {
   await page.goto('https://www.douyin.com');
   await page.getByRole('textbox', { name: '请输入手机号' }).click();
   await page.getByRole('textbox', { name: '请输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
@@ -63,7 +63,7 @@ test("抖音", async ({ page }) => {
 });
 
 
-test("快手", async ({ page }) => {
+test('快手', async ({ page }) => {
   await page.goto('https://www.kuaishou.com/brilliant');
   await w({ page });
   await page.getByText('登录').click();
@@ -77,7 +77,7 @@ test("快手", async ({ page }) => {
 });
 
 
-test("豌豆荚", async ({ page }) => {
+test('豌豆荚', async ({ page }) => {
   await page.goto('https://www.wandoujia.com/apps/280621');
   await page.locator('#header_avatar').click();
   await w({ page });
@@ -107,9 +107,7 @@ test('百度', async ({ page }) => {
   await page.getByRole('button', { name: '发送验证码' }).click();
   await w({ page });
   await page.getByRole('button', { name: '立即注册' }).click();
-  // 更精确地断言倒计时按钮出现，避免多元素匹配
-  const countdownBtn = page.locator('button', { hasText: /\d{1,2}s|\d{1,2}秒/ });
-  await expect(countdownBtn).toBeVisible({ timeout: 5000 });
+  await expect(page.getByText('59')).toBeVisible();
 });
 
 test('天猫', async ({ page }) => {
@@ -117,7 +115,9 @@ test('天猫', async ({ page }) => {
   await page.getByRole('link', { name: '短信登录' }).click();
   await page.getByRole('textbox', { name: '请输入手机号' }).click();
   await w({ page });
-  await page.get
+  await page.getByRole('textbox', { name: '请输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
+  await page.getByRole('link', { name: '获取验证码' }).click();
+  await w({ page });
   await expect(page.getByText('重发')).toBeVisible();
 });
 
@@ -129,7 +129,7 @@ test('凤凰网', async ({ page }) => {
   await expect(page.getByText('重新获取')).toBeVisible();
 });
 
-test("私募网", async ({ page }) => {
+test('私募网', async ({ page }) => {
   await page.goto("https://www.simuwang.com/crtUpload?back_url=https://fof.simuwang.com/login&apply_type=0");
   await page.getByRole("textbox", { name: "请输入手机号" }).click();
   await page
@@ -157,7 +157,7 @@ test("私募网", async ({ page }) => {
 
 });
 
-test('夸克网盘手机号验证码发送', async ({ page }) => {
+test('夸克网盘', async ({ page }) => {
   test.setTimeout(10000); // 设置测试超时时间为 10 秒
   // 1. 访问夸克网盘
   await page.goto('https://pan.quark.cn/');
@@ -176,7 +176,7 @@ test('夸克网盘手机号验证码发送', async ({ page }) => {
   await expect(page.locator('iframe').contentFrame().getByText('获取短信验证码 (57)s')).toBeVisible();
 });
 
-test('迅雷云盘手机号验证码发送', async ({ page }) => {
+test('迅雷云盘', async ({ page }) => {
   // 1. 访问迅雷云盘登录页
   await page.goto('https://pan.xunlei.com/login');
 
@@ -193,7 +193,7 @@ test('迅雷云盘手机号验证码发送', async ({ page }) => {
   await expect(frame.getByRole('textbox', { name: '请输入验证码' })).toBeVisible();
 });
 
-test('知乎手机号验证码发送', async ({ page }) => {
+test('知乎', async ({ page }) => {
   // 1. 访问知乎登录页
   await page.goto('https://www.zhihu.com/signin');
 
@@ -209,3 +209,18 @@ test('知乎手机号验证码发送', async ({ page }) => {
   // 5. 检查验证码输入框可见，说明验证码已发送
   await expect(page.getByRole('textbox', { name: '' }).nth(1)).toBeVisible();
 });
+
+test('夸克AI', async ({ page }) => {
+  // 访问夸克AI首页
+  await page.goto('https://ai.quark.cn/');
+  // 点击右上角登录按钮
+  await page.getByText('登录').click();
+  // 切换到登录iframe
+  const frame = await page.frameLocator('iframe').first();
+  // 输入手机号
+  await frame.getByPlaceholder('输入手机号码').fill(ENV_CONFIG.TARGET_TEL_NUM);
+  // 点击获取验证码
+  await frame.getByText('获取验证码').click();
+  // 断言验证码输入框可见
+  await expect(frame.getByPlaceholder('请输入验证码')).toBeVisible();
+})
