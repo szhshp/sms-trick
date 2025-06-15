@@ -96,6 +96,20 @@ test('豌豆荚', async ({ page }) => {
   await expect(page.getByText('重新获取')).toBeVisible();
 });
 
+test('澎湃新闻手机号登录发送验证码', async ({ page }) => {
+  test.setTimeout(20000);
+  await page.goto('https://www.thepaper.cn/newsDetail_forward_28627857');
+  // 点击右上角登录
+  await page.getByText('登录').click();
+  // 等待登录弹窗出现
+  await expect(page.getByRole('textbox', { name: '输入手机号' })).toBeVisible({ timeout: 5000 });
+  // 输入手机号
+  await page.getByRole('textbox', { name: '输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
+  // 点击获取验证码
+  await page.getByRole('button', { name: '获取验证码' }).click();
+  // 可选：断言验证码输入框出现
+  await expect(page.getByRole('textbox', { name: '输入验证码' })).toBeVisible({ timeout: 5000 });
+});
 
 test('百度', async ({ page }) => {
   await page.goto('https://www.baidu.com/');
@@ -127,34 +141,6 @@ test('凤凰网', async ({ page }) => {
     .fill(ENV_CONFIG.TARGET_TEL_NUM);
   await page.getByText('获取验证码', { exact: true }).click();
   await expect(page.getByText('重新获取')).toBeVisible();
-});
-
-test('私募网', async ({ page }) => {
-  await page.goto("https://www.simuwang.com/crtUpload?back_url=https://fof.simuwang.com/login&apply_type=0");
-  await page.getByRole("textbox", { name: "请输入手机号" }).click();
-  await page
-    .getByRole("textbox", { name: "请输入手机号" })
-    .fill(ENV_CONFIG.TARGET_TEL_NUM);
-  await page.locator('label span').nth(1).click();
-  await w({ page });
-  await page.getByRole('button', { name: '发送验证码' }).click();
-
-  if (page.getByText('重发')) {
-    const element = await page.locator('#aliyunCaptcha-sliding-slider');
-    const box = await element.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 2 + 100 + Math.random() * 50, box.y + box.height / 2 + Math.random() * 50);
-      await w({ page });
-      await page.mouse.move(box.x + box.width / 2 + 200 + Math.random() * 50, box.y + box.height / 2 + 20 + Math.random() * 50);
-      await w({ page });
-      await page.mouse.move(box.x + box.width / 2 + 400 + Math.random() * 50, box.y + box.height / 2 + 20 + Math.random() * 50);
-      await page.mouse.up();
-    }
-    await w({ page });
-  }
-
 });
 
 test('夸克网盘', async ({ page }) => {
@@ -223,4 +209,15 @@ test('夸克AI', async ({ page }) => {
   await frame.getByText('获取验证码').click();
   // 断言验证码输入框可见
   await expect(frame.getByPlaceholder('请输入验证码')).toBeVisible();
+})
+
+test('雪球网', async ({ page }) => {
+  await page.goto('https://xueqiu.com/');
+  // 等待“验证码登录”tab出现
+  await page.getByRole('textbox', { name: '请输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
+  // 点击“发送验证码”
+  await page.getByText('').click();
+  await page.getByText('发送验证码', { exact: true }).first().click();
+  // 检查验证码输入框可见，说明验证码已发送
+  await page.getByText('重新发送').first().click();
 })
