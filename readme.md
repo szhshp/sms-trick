@@ -41,3 +41,12 @@ npx playwright test tests/chromium.spec.js -g "百度"
 ```
 npx playwright test
 ```
+
+
+### Actions
+
+#### 设置一个Secret
+
+![](./docs/1.png)
+
+然后执行 Actions 即可
