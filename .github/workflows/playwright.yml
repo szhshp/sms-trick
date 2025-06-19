@@ -3,7 +3,8 @@ on:
   push:
     branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master ,"test/*"]
+  workflow_dispatch:
 jobs:
   test:
     timeout-minutes: 60
@@ -15,6 +16,10 @@ jobs:
         node-version: lts/*
     - name: Install dependencies
       run: npm install -g pnpm && pnpm install
+    - name: Make ENV File
+      uses: SpicyPizza/create-envfile@v2
+      with:
+        envkey_TARGET_TEL_NUM: ${{ secrets.TARGET_TEL_NUM }}
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps
     - name: Run Playwright tests
