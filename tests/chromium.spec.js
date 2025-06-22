@@ -121,7 +121,7 @@ test('百度', async ({ page }) => {
   await page.getByRole('button', { name: '发送验证码' }).click();
   await w({ page });
   await page.getByRole('button', { name: '立即注册' }).click();
-  await expect(page.getByText('59')).toBeVisible();
+  await expect(page.getByRole('textbox', { name: '59' })).toBeVisible({ timeout: 5000 });
 });
 
 test('天猫', async ({ page }) => {
