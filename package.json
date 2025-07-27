@@ -1,19 +1,41 @@
 {
-  "name": "sms-revenge",
+  "name": "saucelab-playwright",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test:htmlreport": "npx playwright test & npx playwright show-report",
+    "test:full": "npx playwright test",
+    "test:debug": "npx playwright test  --ui",
+    "test:e2e": "npx playwright test --grep @e2e",
+    "type:check": "tsc --noEmit",
+    "prettier:format": "npx prettier --write --ignore-unknown **/*",
+    "prettier:check": "prettier --check --ignore-unknown **/*",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown",
+    "*/**/*.ts": "bash -c 'tsc --noEmit'"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.4.1",
-  "dependencies": {
-    "dotenv": "^16.5.0",
-    "playwright": "^1.52.0"
-  },
   "devDependencies": {
-    "@playwright/test": "^1.52.0",
-    "@types/node": "^22.15.17"
+    "@commitlint/cli": "^19.7.1",
+    "@commitlint/config-conventional": "^19.7.1",
+    "@playwright/test": "^1.43.1",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.12.7",
+    "globals": "^15.1.0",
+    "husky": "^9.1.7",
+    "prettier": "^3.5.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "bson": "^6.8.0",
+    "dotenv": "^16.4.5",
+    "js-yaml": "^4.1.0",
+    "tsx": "^4.19.0"
   }
 }

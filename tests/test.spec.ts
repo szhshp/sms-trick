@@ -1,17 +1,20 @@
-// @ts-check
-import { expect, test, } from '@playwright/test';
 import { ENV_CONFIG } from '../config/setup';
+import { expect, test, } from '@playwright/test';
 
-const w = async ({ page, duration = 3000 }) => {
+const wait = async ({ page, duration = 3000 }: {
+  page: any;
+  duration?: number;
+}) => {
   await page.waitForTimeout(Math.random() * duration);
 }
 
 test('阿里云', async ({ page }) => {
   await page.goto('https://account.aliyun.com/register/qr_register.htm');
-  await w({ page });
+  await wait({ page });
   await page.locator('#alibaba-register-box').contentFrame().getByRole('textbox', { name: '+' }).click();
   await page.locator('#alibaba-register-box').contentFrame().getByRole('textbox', { name: '+' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
-  await w({ page });
+  console.log('ENV_CONFIG.TARGET_TEL_NUM: ', ENV_CONFIG.TARGET_TEL_NUM);
+  await wait({ page });
   await page.locator('#alibaba-register-box').contentFrame().getByRole('button', { name: '获取验证码' }).click();
 });
 
@@ -65,13 +68,13 @@ test('抖音', async ({ page }) => {
 
 test('快手', async ({ page }) => {
   await page.goto('https://www.kuaishou.com/brilliant');
-  await w({ page });
+  await wait({ page });
   await page.getByText('登录').click();
   await page.getByText('手机号登录').click();
-  await w({ page });
+  await wait({ page });
   await page.getByRole('textbox', { name: '请输入手机号' }).click();
   await page.getByRole('textbox', { name: '请输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
-  await w({ page });
+  await wait({ page });
   await page.getByText('获取验证码').click();
   await expect(page.getByText('60s')).toBeVisible();
 });
@@ -80,7 +83,7 @@ test('快手', async ({ page }) => {
 test('豌豆荚', async ({ page }) => {
   await page.goto('https://www.wandoujia.com/apps/280621');
   await page.locator('#header_avatar').click();
-  await w({ page });
+  await wait({ page });
   const element = await page.getByText('');
   const box = await element.boundingBox();
   if (box) {
@@ -89,14 +92,14 @@ test('豌豆荚', async ({ page }) => {
     await page.mouse.move(box.x + box.width / 2 + 500, box.y + box.height / 2);
     await page.mouse.up();
   }
-  await w({ page });
+  await wait({ page });
   await page.getByRole('textbox', { name: '请输入手机号码' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
-  await w({ page });
+  await wait({ page });
   await page.getByText('获取验证码').click();
   await expect(page.getByText('重新获取')).toBeVisible();
 });
 
-test('澎湃新闻手机号登录发送验证码', async ({ page }) => {
+test('澎湃新闻', async ({ page }) => {
   test.setTimeout(20000);
   await page.goto('https://www.thepaper.cn/newsDetail_forward_28627857');
   // 点击右上角登录
@@ -115,11 +118,11 @@ test('百度', async ({ page }) => {
   await page.goto('https://www.baidu.com/');
   await page.getByRole('link', { name: '登录' }).click();
   await page.getByText('短信登录').click();
-  await w({ page });
+  await wait({ page });
   await page.getByRole('textbox', { name: '请输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
   await page.getByRole('checkbox', { name: '阅读并接受' }).check();
   await page.getByRole('button', { name: '发送验证码' }).click();
-  await w({ page });
+  await wait({ page });
   await page.getByRole('button', { name: '立即注册' }).click();
   await expect(page.getByRole('textbox', { name: '59' })).toBeVisible({ timeout: 5000 });
 });
@@ -128,10 +131,10 @@ test('天猫', async ({ page }) => {
   await page.goto('https://login.taobao.com/havanaone/login/login.htm?bizName=taobao');
   await page.getByRole('link', { name: '短信登录' }).click();
   await page.getByRole('textbox', { name: '请输入手机号' }).click();
-  await w({ page });
+  await wait({ page });
   await page.getByRole('textbox', { name: '请输入手机号' }).fill(ENV_CONFIG.TARGET_TEL_NUM);
   await page.getByRole('link', { name: '获取验证码' }).click();
-  await w({ page });
+  await wait({ page });
   await expect(page.getByText('重发')).toBeVisible();
 });
 
